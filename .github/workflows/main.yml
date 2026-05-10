@@ -1,4 +1,4 @@
-name: Build AndroidID Extension
+name: Build AndroidID Extension (Hybrid)
 
 on:
   push:
@@ -13,20 +13,23 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Ambil Library Otomatis
+    - name: Ambil Components Jar dan Verifikasi Library
       run: |
-        mkdir -p lib/android
+        # 1. Pastikan folder tujuan ada
         mkdir -p lib/app-inventor
         
-        # Download Components.jar dari sumber stabil (untuk mengatasi error package not found)
-        curl -L "https://github.com/vknow360/App-Inventor-Extension-Template/raw/master/lib/appinventor/components.jar" -o lib/app-inventor/components.jar
+        # 2. Ambil components.jar dari link MIT yang Bapak maksud
+        # Kita gunakan jalur 'raw' agar bisa didownload sebagai file asli
+        curl -L "https://github.com/mit-cml/appinventor-sources/raw/master/appinventor/lib/appinventor/components.jar" -o lib/app-inventor/components.jar
         
-        # Download Android.jar (untuk mendukung fungsi sistem Android)
-        curl -L "https://github.com/ShreyashSaitwal/AI2-Extension-Template-Template/raw/master/lib/android/android.jar" -o lib/android/android.jar
-
-        echo "--- Verifikasi Library ---"
+        # 3. Verifikasi file yang Bapak upload manual + hasil download
+        echo "--- Daftar Library di lib/app-inventor ---"
         ls -lh lib/app-inventor/
-        ls -lh lib/android/
+        
+        # Peringatan jika file download ternyata kosong (404)
+        if [ ! -s lib/app-inventor/components.jar ]; then
+          echo "PERINGATAN: components.jar kosong/gagal ambil dari MIT."
+        fi
 
     - name: Set up JDK 8
       uses: actions/setup-java@v4
@@ -37,11 +40,11 @@ jobs:
     - name: Install Ant
       run: sudo apt-get update && sudo apt-get install -y ant
 
-    - name: Eksekusi Ant Build
+    - name: Jalankan Build Ant
       run: ant extensions
 
-    - name: Kirim Hasil AIX ke Artifact
+    - name: Simpan Hasil AIX
       uses: actions/upload-artifact@v4
       with:
-        name: Ekstensi-AndroidID-Bapak-Mahrus
+        name: AndroidID-Final-Build
         path: out/*.aix
