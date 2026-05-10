@@ -1,4 +1,4 @@
-name: Build Extension
+name: Build Extension Otomatis
 
 on:
   push:
@@ -10,8 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
+    - name: Checkout Repo
       uses: actions/checkout@v4
+
+    - name: Ambil Components Jar Langsung
+      run: |
+        mkdir -p lib/app-inventor
+        # Link ini menggunakan jalur yang kita temukan di gambar Bapak tadi
+        curl -L "https://github.com/mit-cml/appinventor-sources/raw/master/appinventor/lib/appinventor/components.jar" -o lib/app-inventor/components.jar
+        
+        # Cek apakah file berhasil diambil atau masih kosong
+        ls -lh lib/app-inventor/
 
     - name: Set up JDK 8
       uses: actions/setup-java@v4
@@ -22,34 +31,11 @@ jobs:
     - name: Install Ant
       run: sudo apt-get update && sudo apt-get install -y ant
 
-    - name: Setup Dependencies
-      run: |
-        mkdir -p lib/android lib/appinventor lib/ant-contrib
-        
-        # Link Raw GitHub yang benar (menggunakan raw.githubusercontent.com)
-        BASE_URL="https://raw.githubusercontent.com/mit-cml/extension-template/master"
-        
-        echo "Mengunduh library inti..."
-        wget --quiet --show-progress "$BASE_URL/lib/android/android.jar" -O lib/android/android.jar
-        wget --quiet --show-progress "$BASE_URL/lib/appinventor/AnnotationProcessors.jar" -O lib/appinventor/AnnotationProcessors.jar
-        wget --quiet --show-progress "$BASE_URL/lib/appinventor/CommonUtils.jar" -O lib/appinventor/CommonUtils.jar
-        wget --quiet --show-progress "$BASE_URL/lib/appinventor/components.jar" -O lib/appinventor/components.jar
-        wget --quiet --show-progress "$BASE_URL/lib/appinventor/dx.jar" -O lib/appinventor/dx.jar
-        wget --quiet --show-progress "$BASE_URL/lib/ant-contrib/ant-contrib-1.0b3.jar" -O lib/ant-contrib/ant-contrib-1.0b3.jar
-
-    - name: Verify Libraries
-      run: |
-        echo "Ukuran file yang diunduh:"
-        du -sh lib/android/*
-        du -sh lib/appinventor/*
-        du -sh lib/ant-contrib/*
-
-    - name: Build with Ant
+    - name: Build Extension
       run: ant extensions
 
-    - name: Upload AIX Artifact
+    - name: Upload AIX
       uses: actions/upload-artifact@v4
       with:
-        name: AndroidID-Extension
+        name: AndroidID-v1
         path: out/*.aix
-        if-no-files-found: error
