@@ -13,7 +13,7 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
       with:
-        submodules: recursive # Langkah ini akan menarik isi folder appinventor & deps
+        submodules: recursive
 
     - name: Set up JDK 8
       uses: actions/setup-java@v4
@@ -24,19 +24,27 @@ jobs:
     - name: Install Ant
       run: sudo apt-get update && sudo apt-get install -y ant
 
-    - name: Setup Lib Directory
-      # Menghubungkan folder library dari submodule ke tempat yang dicari build.xml
+    - name: Setup Dependencies
       run: |
-        mkdir -p lib/android
-        mkdir -p lib/appinventor
-        cp deps/android/android.jar lib/android/ || curl -L https://github.com/mit-cml/extension-template/raw/master/lib/android/android.jar -o lib/android/android.jar
-        cp -r deps/appinventor/* lib/appinventor/ || echo "Using existing libs"
+        mkdir -p lib/android lib/appinventor lib/ant-contrib
+        
+        # Download Android SDK Core
+        curl -L https://github.com/mit-cml/extension-template/raw/master/lib/android/android.jar -o lib/android/android.jar
+        
+        # Download App Inventor Libraries
+        curl -L https://github.com/mit-cml/extension-template/raw/master/lib/appinventor/AnnotationProcessors.jar -o lib/appinventor/AnnotationProcessors.jar
+        curl -L https://github.com/mit-cml/extension-template/raw/master/lib/appinventor/CommonUtils.jar -o lib/appinventor/CommonUtils.jar
+        curl -L https://github.com/mit-cml/extension-template/raw/master/lib/appinventor/components.jar -o lib/appinventor/components.jar
+        curl -L https://github.com/mit-cml/extension-template/raw/master/lib/appinventor/dx.jar -o lib/appinventor/dx.jar
+        
+        # Download Ant Contrib (Penting untuk proses <foreach>)
+        curl -L https://github.com/mit-cml/extension-template/raw/master/lib/ant-contrib/ant-contrib-1.0b3.jar -o lib/ant-contrib/ant-contrib-1.0b3.jar
 
-    - name: Build Extension
+    - name: Build with Ant
       run: ant extensions
 
-    - name: Upload AIX Artifact
+    - name: Upload Extension Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: AndroidID-Extension
+        name: AndroidID-AIX
         path: out/*.aix
