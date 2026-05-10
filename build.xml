@@ -7,14 +7,13 @@
     <property name="public.build.dir" location="out" />
     
     <property name="android.lib" location="${lib.dir}/android/android.jar" />
-    <property name="app-inventor.dir" location="${lib.dir}/app-inventor" />
-    <property name="components.jar" location="${app-inventor.dir}/components.jar" />
-    <property name="dx.jar" location="${app-inventor.dir}/dx.jar" />
+    <property name="components.jar" location="${lib.dir}/app-inventor/components.jar" />
+    <property name="dx.jar" location="${lib.dir}/app-inventor/dx.jar" />
 
     <path id="libs.path">
         <pathelement location="${android.lib}" />
         <pathelement location="${components.jar}" />
-        <fileset dir="${app-inventor.dir}">
+        <fileset dir="${lib.dir}/app-inventor">
             <include name="*.jar" />
         </fileset>
     </path>
@@ -34,19 +33,18 @@
     </target>
 
     <target name="dex" depends="compile">
-        <echo message="Proses Dexing dengan dx.jar..." />
+        <echo message="Proses Dexing untuk kompatibilitas Android..." />
         <java jar="${dx.jar}" fork="true" failonerror="true">
             <arg value="--dex" />
-            <arg value="--no-strict" />
             <arg value="--output" />
             <arg value="${build.dir}/externalComponents/com.mahrus.androidid/classes.jar" />
-            <arg value="${build.dir}/classes" />
+            <arg path="${build.dir}/classes" />
         </java>
     </target>
 
     <target name="extensions" depends="dex">
         <jar destfile="${build.dir}/externalComponents/com.mahrus.androidid/files/AndroidRuntime.jar" basedir="${build.dir}/classes" />
-        <zip destfile="${public.build.dir}/AndroidID_Fixed.aix" basedir="${build.dir}/externalComponents" />
-        <echo message="Ekstensi Standar Berhasil Dibuat!" />
+        <zip destfile="${public.build.dir}/com.mahrus.androidid.aix" basedir="${build.dir}/externalComponents" />
+        <echo message="Selesai! AIX siap digunakan." />
     </target>
 </project>
