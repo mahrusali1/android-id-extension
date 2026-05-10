@@ -5,10 +5,6 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
-env:
-  # Menghilangkan peringatan Node.js 20
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,9 +12,6 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        fetch-depth: 0
 
     - name: Set up JDK 8
       uses: actions/setup-java@v4
@@ -29,52 +22,34 @@ jobs:
     - name: Install Ant
       run: sudo apt-get update && sudo apt-get install -y ant
 
-    - name: Setup Lib Directory
+    - name: Setup Dependencies
       run: |
         mkdir -p lib/android lib/appinventor lib/ant-contrib
         
-        # Fungsi untuk unduh jika file tidak ada di deps
-        download_if_missing() {
-          if [ ! -f "$1" ]; then
-            echo "File $1 tidak ditemukan di deps, mengunduh dari master..."
-            wget -q "https://raw.githubusercontent.com/mit-cml/extension-template/master/$1" -O "$2" || echo "Gagal unduh $1"
-          else
-            cp "$1" "$2"
-          fi
-        }
-
-        # Eksekusi sinkronisasi library
-        download_if_missing "deps/android/android.jar" "lib/android/android.jar"
-        download_if_missing "deps/ant-contrib/ant-contrib-1.0b3.jar" "lib/ant-contrib/ant-contrib-1.0b3.jar"
+        # Link Raw GitHub yang benar (menggunakan raw.githubusercontent.com)
+        BASE_URL="https://raw.githubusercontent.com/mit-cml/extension-template/master"
         
-        # Untuk folder appinventor, kita coba salin atau unduh satu per satu yang penting
-        if [ -d "deps/appinventor" ] && [ "$(ls -A deps/appinventor)" ]; then
-          cp -r deps/appinventor/* lib/appinventor/
-        else
-          wget -q https://raw.githubusercontent.com/mit-cml/extension-template/master/lib/appinventor/AnnotationProcessors.jar -O lib/appinventor/AnnotationProcessors.jar
-          wget -q https://raw.githubusercontent.com/mit-cml/extension-template/master/lib/appinventor/CommonUtils.jar -O lib/appinventor/CommonUtils.jar
-          wget -q https://raw.githubusercontent.com/mit-cml/extension-template/master/lib/appinventor/components.jar -O lib/appinventor/components.jar
-          wget -q https://raw.githubusercontent.com/mit-cml/extension-template/master/lib/appinventor/dx.jar -O lib/appinventor/dx.jar
-        fi
+        echo "Mengunduh library inti..."
+        wget --quiet --show-progress "$BASE_URL/lib/android/android.jar" -O lib/android/android.jar
+        wget --quiet --show-progress "$BASE_URL/lib/appinventor/AnnotationProcessors.jar" -O lib/appinventor/AnnotationProcessors.jar
+        wget --quiet --show-progress "$BASE_URL/lib/appinventor/CommonUtils.jar" -O lib/appinventor/CommonUtils.jar
+        wget --quiet --show-progress "$BASE_URL/lib/appinventor/components.jar" -O lib/appinventor/components.jar
+        wget --quiet --show-progress "$BASE_URL/lib/appinventor/dx.jar" -O lib/appinventor/dx.jar
+        wget --quiet --show-progress "$BASE_URL/lib/ant-contrib/ant-contrib-1.0b3.jar" -O lib/ant-contrib/ant-contrib-1.0b3.jar
 
-    - name: Debug Folder Structure
+    - name: Verify Libraries
       run: |
-        echo "Isi folder lib:"
-        ls -R lib/
-        echo "Isi folder src:"
-        ls -R src/
+        echo "Ukuran file yang diunduh:"
+        du -sh lib/android/*
+        du -sh lib/appinventor/*
+        du -sh lib/ant-contrib/*
 
     - name: Build with Ant
       run: ant extensions
 
-    - name: Check Output
-      run: |
-        echo "Cek isi folder out setelah build:"
-        ls -R out/ || echo "Folder out tidak ditemukan!"
-
-    - name: Upload Extension Artifact
+    - name: Upload AIX Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: AndroidID-AIX
+        name: AndroidID-Extension
         path: out/*.aix
         if-no-files-found: error
