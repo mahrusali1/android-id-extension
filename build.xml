@@ -47,6 +47,6 @@
     <target name="extensions" depends="dex">
         <jar destfile="${build.dir}/externalComponents/com.mahrus.androidid/files/AndroidRuntime.jar" basedir="${build.dir}/classes" />
         <zip destfile="${public.build.dir}/com.mahrus.androidid.aix" basedir="${build.dir}/externalComponents" />
-        <echo message="Selesai! AIX Standar Berhasil Dibuat." />
+        <echo message="Selesai! AIX Berhasil Dibuat." />
     </target>
 </project>
