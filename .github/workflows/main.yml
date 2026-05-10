@@ -28,17 +28,24 @@ jobs:
       run: |
         mkdir -p lib/android lib/appinventor lib/ant-contrib
         
-        # Download Android SDK Core
-        curl -L https://github.com/mit-cml/extension-template/raw/master/lib/android/android.jar -o lib/android/android.jar
+        # Menggunakan sumber dari pengembang ekstensi App Inventor yang stabil (Fastly/Rush/Niotes)
+        # Android Jar
+        curl -L https://github.com/ShreyashSaitwal/AI2-Extension-Template-Template/raw/master/lib/android/android.jar -o lib/android/android.jar
         
-        # Download App Inventor Libraries
-        curl -L https://github.com/mit-cml/extension-template/raw/master/lib/appinventor/AnnotationProcessors.jar -o lib/appinventor/AnnotationProcessors.jar
-        curl -L https://github.com/mit-cml/extension-template/raw/master/lib/appinventor/CommonUtils.jar -o lib/appinventor/CommonUtils.jar
-        curl -L https://github.com/mit-cml/extension-template/raw/master/lib/appinventor/components.jar -o lib/appinventor/components.jar
-        curl -L https://github.com/mit-cml/extension-template/raw/master/lib/appinventor/dx.jar -o lib/appinventor/dx.jar
+        # App Inventor Core Libs
+        curl -L https://github.com/ShreyashSaitwal/AI2-Extension-Template-Template/raw/master/lib/appinventor/AnnotationProcessors.jar -o lib/appinventor/AnnotationProcessors.jar
+        curl -L https://github.com/ShreyashSaitwal/AI2-Extension-Template-Template/raw/master/lib/appinventor/CommonUtils.jar -o lib/appinventor/CommonUtils.jar
+        curl -L https://github.com/ShreyashSaitwal/AI2-Extension-Template-Template/raw/master/lib/appinventor/components.jar -o lib/appinventor/components.jar
+        curl -L https://github.com/ShreyashSaitwal/AI2-Extension-Template-Template/raw/master/lib/appinventor/dx.jar -o lib/appinventor/dx.jar
         
-        # Download Ant Contrib (Penting untuk proses <foreach>)
-        curl -L https://github.com/mit-cml/extension-template/raw/master/lib/ant-contrib/ant-contrib-1.0b3.jar -o lib/ant-contrib/ant-contrib-1.0b3.jar
+        # Ant Contrib
+        curl -L https://github.com/ShreyashSaitwal/AI2-Extension-Template-Template/raw/master/lib/ant-contrib/ant-contrib-1.0b3.jar -o lib/ant-contrib/ant-contrib-1.0b3.jar
+
+    - name: Verify Jars
+      # Langkah ini untuk memastikan file yang diunduh bukan file kosong/rusak
+      run: |
+        ls -lh lib/android/
+        ls -lh lib/appinventor/
 
     - name: Build with Ant
       run: ant extensions
