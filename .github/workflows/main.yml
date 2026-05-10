@@ -13,17 +13,19 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Ambil Library Baru dan Bersih
+    - name: Ambil Library dari Sumber Resmi MIT
       run: |
-        # Menghapus file lama yang terdeteksi rusak (Error ZIP)
+        # Bersihkan folder library agar tidak ada file corrupt
         rm -rf lib/android lib/app-inventor
         mkdir -p lib/android lib/app-inventor
         
-        # Download ulang menggunakan link yang Bapak buktikan berhasil
-        curl -fL "https://github.com/vknow360/App-Inventor-Extension-Template/raw/master/lib/appinventor/components.jar" -o lib/app-inventor/components.jar
-        curl -fL "https://github.com/ShreyashSaitwal/AI2-Extension-Template-Template/raw/master/lib/android/android.jar" -o lib/android/android.jar
+        # Mengambil components.jar langsung dari folder lib repositori MIT yang Bapak infokan
+        curl -L "https://github.com/mit-cml/appinventor-sources/raw/master/appinventor/lib/appinventor/components.jar" -o lib/app-inventor/components.jar
+        
+        # Mengambil android.jar (SDK 35) dari folder lib repositori MIT yang Bapak infokan
+        curl -L "https://github.com/mit-cml/appinventor-sources/raw/master/appinventor/lib/android/android-35/android.jar" -o lib/android/android.jar
 
-        echo "--- Verifikasi Ukuran File ---"
+        echo "--- Verifikasi File dari Sumber Resmi MIT ---"
         ls -lh lib/app-inventor/components.jar
         ls -lh lib/android/android.jar
 
