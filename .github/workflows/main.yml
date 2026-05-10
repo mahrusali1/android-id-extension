@@ -10,24 +10,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
+    - name: Checkout Repositori Bapak
       uses: actions/checkout@v4
+      with:
+        path: main-repo
 
-    - name: Ambil Library dari Sumber Resmi MIT
+    - name: Pinjam Library dari MIT
+      uses: actions/checkout@v4
+      with:
+        repository: mit-cml/appinventor-sources
+        path: mit-repo
+        sparse-checkout: |
+          appinventor/lib/appinventor/components.jar
+          appinventor/lib/android/android-35/android.jar
+        sparse-checkout-cone-mode: false
+
+    - name: Sinkronisasi Folder
       run: |
-        # Bersihkan folder library agar tidak ada file corrupt
-        rm -rf lib/android lib/app-inventor
-        mkdir -p lib/android lib/app-inventor
-        
-        # Mengambil components.jar langsung dari folder lib repositori MIT yang Bapak infokan
-        curl -L "https://github.com/mit-cml/appinventor-sources/raw/master/appinventor/lib/appinventor/components.jar" -o lib/app-inventor/components.jar
-        
-        # Mengambil android.jar (SDK 35) dari folder lib repositori MIT yang Bapak infokan
-        curl -L "https://github.com/mit-cml/appinventor-sources/raw/master/appinventor/lib/android/android-35/android.jar" -o lib/android/android.jar
-
-        echo "--- Verifikasi File dari Sumber Resmi MIT ---"
-        ls -lh lib/app-inventor/components.jar
-        ls -lh lib/android/android.jar
+        mkdir -p main-repo/lib/app-inventor
+        mkdir -p main-repo/lib/android
+        cp mit-repo/appinventor/lib/appinventor/components.jar main-repo/lib/app-inventor/
+        cp mit-repo/appinventor/lib/android/android-35/android.jar main-repo/lib/android/android.jar
+        echo "Cek integritas file:"
+        ls -lh main-repo/lib/app-inventor/components.jar
 
     - name: Set up JDK 8
       uses: actions/setup-java@v4
@@ -39,10 +44,12 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y ant
 
     - name: Eksekusi Ant Build
-      run: ant extensions
+      run: |
+        cd main-repo
+        ant extensions
 
-    - name: Upload Hasil AIX
+    - name: Upload AIX
       uses: actions/upload-artifact@v4
       with:
-        name: Ekstensi-AndroidID-Bapak-Mahrus
-        path: out/*.aix
+        name: AndroidID-Sempurna
+        path: main-repo/out/*.aix
