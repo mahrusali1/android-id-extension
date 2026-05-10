@@ -13,18 +13,19 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Ambil Library Otomatis
+    - name: Ambil Library Baru dan Bersih
       run: |
-        mkdir -p lib/android
-        mkdir -p lib/app-inventor
+        # Menghapus file lama yang terdeteksi rusak (Error ZIP)
+        rm -rf lib/android lib/app-inventor
+        mkdir -p lib/android lib/app-inventor
         
-        # Menggunakan link yang sudah Bapak buktikan berhasil sebelumnya
-        curl -L "https://github.com/vknow360/App-Inventor-Extension-Template/raw/master/lib/appinventor/components.jar" -o lib/app-inventor/components.jar
-        curl -L "https://github.com/ShreyashSaitwal/AI2-Extension-Template-Template/raw/master/lib/android/android.jar" -o lib/android/android.jar
+        # Download ulang menggunakan link yang Bapak buktikan berhasil
+        curl -fL "https://github.com/vknow360/App-Inventor-Extension-Template/raw/master/lib/appinventor/components.jar" -o lib/app-inventor/components.jar
+        curl -fL "https://github.com/ShreyashSaitwal/AI2-Extension-Template-Template/raw/master/lib/android/android.jar" -o lib/android/android.jar
 
-        echo "--- Verifikasi Library ---"
-        ls -lh lib/app-inventor/
-        ls -lh lib/android/
+        echo "--- Verifikasi Ukuran File ---"
+        ls -lh lib/app-inventor/components.jar
+        ls -lh lib/android/android.jar
 
     - name: Set up JDK 8
       uses: actions/setup-java@v4
@@ -38,7 +39,7 @@ jobs:
     - name: Eksekusi Ant Build
       run: ant extensions
 
-    - name: Kirim Hasil AIX ke Artifact
+    - name: Upload Hasil AIX
       uses: actions/upload-artifact@v4
       with:
         name: Ekstensi-AndroidID-Bapak-Mahrus
