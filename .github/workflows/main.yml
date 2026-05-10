@@ -3,9 +3,7 @@ name: Build Extension
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  workflow_dispatch: # Memungkinkan menjalankan build secara manual
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,6 +21,10 @@ jobs:
 
     - name: Install Ant
       run: sudo apt-get update && sudo apt-get install -y ant
+
+    - name: Download Dependencies
+      # Ini langkah krusial agar file android.jar dan appinventor library terunduh
+      run: ant purist
 
     - name: Build Extension
       run: ant extensions
